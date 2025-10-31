@@ -6,22 +6,22 @@ Documento técnico que describe una **metodología completa y reproducible** par
 
 1. [Introducción](#introducción)
 2. [Configuración del laboratorio](#2-configuración-del-laboratorio)
-2.1 [Red](#21-red)
+    2.1 [Red](#21-red)
 3. [Programas y herramientas necesarias](#3-programas-y-herramientas-necesarias)
-3.1 [VulnServer](#31-vulnserver)
-3.2 [Mona](#32-mona)
-3.3 [Immunity Debugger](#33-immunity-debugger)
-3.4 [IDA Free](#34-ida-free)
-3.5 [Scripts PY](#35-scripts-py)
+    3.1 [VulnServer](#31-vulnserver)
+    3.2 [Mona](#32-mona)
+    3.3 [Immunity Debugger](#33-immunity-debugger)
+    3.4 [IDA Free](#34-ida-free)
+    3.5 [Scripts PY](#35-scripts-py)
 4. [Metodología de Análisis](#4-metodología-de-análisis)
-4.1 [Fases Metodológicas del Análisis](#41-fases-metodológicas-del-análisis)
+    4.1 [Fases Metodológicas del Análisis](#41-fases-metodológicas-del-análisis)
 5. [Despliegue de la explotación](#5-despliegue-de-la-explotación)
-5.1 [Reconocimiento y fuzzing](#51-reconocimiento-y-fuzzing)
-5.2 [Descubrimiento del Offset a EIP](#52-descubrimiento-del-offset-a-eip)
-5.3 [Control y validación EIP](#53-control-y-validación-eip)
-5.4 [Identificación de Bad Characters](#54-identificación-de-bad-characters)
-5.5 [JMP ESP](#55-jmp-esp)
-5.6 [Generación del Shellcode](#56-generación-del-shellcode)
+    5.1 [Reconocimiento y fuzzing](#51-reconocimiento-y-fuzzing)
+    5.2 [Descubrimiento del Offset a EIP](#52-descubrimiento-del-offset-a-eip)
+    5.3 [Control y validación EIP](#53-control-y-validación-eip)
+    5.4 [Identificación de Bad Characters](#54-identificación-de-bad-characters)
+    5.5 [JMP ESP](#55-jmp-esp)
+    5.6 [Generación del Shellcode](#56-generación-del-shellcode)
 
 ---
 
@@ -153,13 +153,13 @@ Configuramos Mona en Imminuty Debugger para guardar los logs con el comando `!mo
 
 ![pattern_create](./img/pattern_create.png)
 
-2. Ejecutamos el script de Python y al crashear el programa nos fijamos el valor que ha sobrescrito el EIP, en este caso es `396F4338`
+Ejecutamos el script de Python y al crashear el programa nos fijamos el valor que ha sobrescrito el EIP, en este caso es `396F4338`
 
 ![pyIEP](./img/pyIEP.png)
 
 ![debuggcrashEIP](./img/debuggcrashEIP.png)
 
-3. Después del crash en Immunity, en la consola de Immunity ejecuta:`!mona pattern_offset 396F4338`
+Después del crash en Immunity, en la consola de Immunity ejecuta:`!mona pattern_offset 396F4338`
 
 ![pattern_offset](./img/pattern_offset.png)
 
@@ -200,15 +200,24 @@ El objetivo de identificar **_badchars_** es detectar qué bytes son transformad
 
 ### 5.5 🐇 JMP ESP
 
-1. Volvemos a las direcciones en donde haya un salto a la ESP, utilizaremos nuevamente `!mona jmp -r esp` y seleccionamos la dirección **`0x625011c7`**.
+Volvemos a las direcciones en donde haya un salto a la ESP, utilizaremos nuevamente `!mona jmp -r esp` y seleccionamos la dirección **`0x625011c7`**.
+
 ![jmp1](./img/jmp1.png)
-2. Vamos a CPU  y en el cuadro izquierdo superior con click derecho le damos `go to > expression`.
+
+Vamos a CPU  y en el cuadro izquierdo superior con click derecho le damos `go to > expression`.
+
 ![goto](./img/goto.png)
-3. Esta dirección tiene un salto hacia el ESP.
+
+Esta dirección tiene un salto hacia el ESP.
+
 ![goto1](./img/goto1.png)
-4. Ejecutamos el script para hacer la prueba del salto con una secuencia de **10 NOPS (\x90)** y **3 (0xCC)** _breakpoints_ donde termina.
+
+Ejecutamos el script para hacer la prueba del salto con una secuencia de **10 NOPS (\x90)** y **3 (0xCC)** _breakpoints_ donde termina.
+
 ![py6](./img/py6.png)
-5. Vemos el resultado y confirmamos que se redirige la ejecución correctamente.
+
+Vemos el resultado y confirmamos que se redirige la ejecución correctamente.
+
 ![jmp2](./img/jmp2.png)
 
 ### 5.6 💻 Generación del Shellcode
@@ -228,8 +237,11 @@ El objetivo de identificar **_badchars_** es detectar qué bytes son transformad
 
 Comando `Netcat` que pone a la máquina escuchando en el puerto 443 a la espera:
 `sudo nc -nlvp 443`
+
 ![nc](./img/nc.png)
-2. Ejecutamos script para hacer la reverse shell
+
+Ejecutamos script para hacer la reverse shell
+
 ![py7](./img/py7.png)
 
 Se me crashea el vulnserver al lanzar el script y no llega la escucha desde nc en kali he probado de todo y no encuentro la manera de arreglarlo
