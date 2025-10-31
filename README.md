@@ -158,10 +158,12 @@ Mona devolverá el offset en bytes, por lo que el offset es **2006 bytes** que e
 
 1. Enviar un patrón único que provoque el crash, ejecutamos el siguiente exploit que envia 2006 bytes de `A` seguidos y de 4 bytes `BBBB`
 ![py4](./img/py4.png)
-2. Tras el exploit, visualizamos en Immunity el registro de EIP  esta sobrescrito donde `BBBB` = 42424242
-En el valor del tope de la pila `ESP`, hacemos click derecho y seleccionamos `Follow in Dump` y nos mostrara las `A` y luego las `BBBB` para ver la sobreescritura.
+2. Tras el exploit, visualizamos en Immunity el registro de EIP  esta sobrescrito donde `BBBB` = 42424242. En el valor del tope de la pila `ESP`, hacemos click derecho y seleccionamos `Follow in Dump` y nos mostrara las `A` y luego las `BBBB` para ver la sobreescritura.
+
 ![ESP](./img/ESP.png)
+
 ![41](./img/41.png)
+
 Lo que indica que se ha conseguido dominar el flujo de ejecución hasta ese punto y permite avanzar a la etapa siguiente
 
 ### 5.4 🔎Encuentra Bad Characters
