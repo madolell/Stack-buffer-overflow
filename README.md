@@ -4,24 +4,24 @@ Documento técnico que describe una **metodología completa y reproducible** par
 
 ## Contenido
 
-1. [Introducción]
-2. [Configuración del laboratorio]
-2.1 [Red]
-3. [Programas y herramientas necesarias]
-3.1 [VulnServer]
-3.2 [Mona]
-3.3 [Immunity Debugger]
-3.4 [IDA Free]
-3.5 [Scripts PY]
-4. [Metodología de Análisis]
-4.1. [Fases Metodológicas del Análisis]
-5. [Despliegue de la explotación]
-5.1. [Reconocimiento y fuzzing]
-5.2. [Descubrimiento del Offset a EIP]
-5.3. [Control y validación EIP ]
-5.4. [Identificación de Bad Characters]
-5.5. [JMP ESP]
-5.6. [Generación del Shellcode]
+1. [Introducción](#introducción)
+2. [Configuración del laboratorio](#2-configuración-del-laboratorio)
+2.1 [Red](#21-red)
+3. [Programas y herramientas necesarias](#3-programas-y-herramientas-necesarias)
+3.1 [VulnServer](#31-vulnserver)
+3.2 [Mona](#32-mona)
+3.3 [Immunity Debugger](#33-immunity-debugger)
+3.4 [IDA Free](#34-ida-free)
+3.5 [Scripts PY](#35-scripts-py)
+4. [Metodología de Análisis](#4-metodología-de-análisis)
+4.1 [Fases Metodológicas del Análisis](#41-fases-metodológicas-del-análisis)
+5. [Despliegue de la explotación](#5-despliegue-de-la-explotación)
+5.1 [Reconocimiento y fuzzing](#51-reconocimiento-y-fuzzing)
+5.2 [Descubrimiento del Offset a EIP](#52-descubrimiento-del-offset-a-eip)
+5.3 [Control y validación EIP](#53-control-y-validación-eip)
+5.4 [Identificación de Bad Characters](#54-identificación-de-bad-characters)
+5.5 [JMP ESP](#55-jmp-esp)
+5.6 [Generación del Shellcode](#56-generación-del-shellcode)
 
 ---
 
@@ -37,7 +37,7 @@ El laboratorio se ha montado como un entorno aislado y reproducible compuesto po
 
 - **Kali Linux (Attacker)**: máquina atacante para generación de payloads, fuzzing y ejecución de scripts de prueba.
 
-### 2.1 Red interna
+### 2.1 Red
 
 Configuración de red: ambas VMs en **una red interna**
 
@@ -67,6 +67,7 @@ Cuando abrimos `!mona` en Immunity Debugger nos da error. Para solucionarlo tene
 ### 3.4 IDA Free
 
 Es un **desensamblador y entorno de análisis estático de binarios interactivo**, ampliamente usado por analistas de malware, reversing engineers y exploit developers para entender el código máquina sin tener el código fuente. Se descarga [aqui](https://out7.hex-rays.com/files/idafree84_windows.exe).
+
 ![IDA](./img/IDA.png)
 
 ### 3.5 Scripts PY
@@ -141,17 +142,27 @@ Con el segundo script enviamos paquetes más largos de forma incremental sobre e
 El descubrimiento del **_offset a EIP_** consiste en determinar la posición exacta dentro de un input en la que se sobrescribe el registro de retorno. Primero se envía un patrón único y reproducible que provoca un fallo controlado, luego se identifica el valor que quedó en EIP y se calcula la distancia (offset) desde el inicio del payload hasta ese registro.
 
 Configuramos Mona en Imminuty Debugger para guardar los logs con el comando `!mona config -set workingfolder <ruta del archivo>`
+
 ![monalog](./img/monalog.png)
+
 **Es importante saber el EIP para saber cual es la longitud y sobrescribir por demás para generar el buffer overflow. Se puede visualizar en Immunity.**
+
 ![EIP](./img/EIP.png)
 
 1. Generamos un **patrón cíclico** para encontrar el desplazamiento exacto del fallo y se guardara en el directorio que pusimos anteriormente: `!mona pattern_create 3000`
+
 ![pattern_create](./img/pattern_create.png)
+
 2. Ejecutamos el script de Python y al crashear el programa nos fijamos el valor que ha sobrescrito el EIP, en este caso es `396F4338`
+
 ![pyIEP](./img/pyIEP.png)
+
 ![debuggcrashEIP](./img/debuggcrashEIP.png)
+
 3. Después del crash en Immunity, en la consola de Immunity ejecuta:`!mona pattern_offset 396F4338`
+
 ![pattern_offset](./img/pattern_offset.png)
+
 Mona devolverá el offset en bytes, por lo que el offset es **2006 bytes** que es la longitud hasta sobrescribir el EIP.
 
 ### 5.3 🔒 Control y validación EIP
